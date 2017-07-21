@@ -1,0 +1,58 @@
+package form;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.ui.ModelMap;
+
+import com.aisino.platform.core.SqlPlugin;
+import com.aisino.platform.db.DbSvr;
+import com.aisino.platform.veng.json.dauglas.JSONArray;
+import com.alibaba.fastjson.JSON;
+
+public class Gaoweidb extends SqlPlugin{
+	public HttpServletRequest showUserInfos(HttpServletRequest request, HttpServletResponse response){
+		
+		String sql1="select GFMC name from dzdz_fpxx_zzsfp where GFMC like ? group by GFMC";
+		String sql2="select XFMC name,XFMC source,GFMC target from dzdz_fpxx_zzsfp where GFMC in ("+sql1+") group by XFMC,GFMC";
+		String sql3="select GFMC name,GFMC source,XFMC target from dzdz_fpxx_zzsfp where XFMC in ("+sql1+") group by GFMC,XFMC";
+		String sql22="select XFMC name,XFMC source,GFMC target from dzdz_fpxx_zzsfp where GFMC in (select name from ("+sql2+")) group by XFMC,GFMC";
+		String sql33="select GFMC name,GFMC source,XFMC target from dzdz_fpxx_zzsfp where XFMC in (select name from ("+sql3+")) group by GFMC,XFMC";
+		try {
+			request.setCharacterEncoding("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String chaxun="%"+request.getParameter("chaxuntext")+"%";
+		DbSvr svr=this.getDbService();
+		System.out.println("进入controller层了");
+		
+			
+			
+		
+				List<Map> executeQuery = svr.getListResult(sql1,chaxun);
+				request.setAttribute("jieguobox0",JSON.toJSON(executeQuery));
+				
+			
+			
+				List<Map> executeQuery2 = svr.getListResult(sql2,chaxun);
+				List<Map> executeQuery3 = svr.getListResult(sql3,chaxun);
+				List<Map> executeQuery22 = svr.getListResult(sql22,chaxun);
+				List<Map> executeQuery33 = svr.getListResult(sql33,chaxun);
+				request.setAttribute("jieguobox",JSON.toJSON(executeQuery2));
+				request.setAttribute("jieguobos",JSON.toJSON(executeQuery3));
+				request.setAttribute("jieguobox22",JSON.toJSON(executeQuery22));
+				request.setAttribute("jieguobos33",JSON.toJSON(executeQuery33));
+			
+			
+		
+		
+		
+		return request;
+	}
+}
