@@ -1,0 +1,47 @@
+package form;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class Gaowei4 extends HttpServlet{
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	// TODO Auto-generated method stub
+		//get传过来的参数为查询按钮调用进来的
+		String name=new String(request.getParameter("chaxuntext").getBytes("iso-8859-1"),"UTF-8");
+		Object result=new Gaoweidb2().getData(name);
+		request.setAttribute("Infodata", result);
+		request.getRequestDispatcher("/gaowei2.jsp").forward(request, response);
+		
+}
+
+/**
+ * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+ */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	// TODO Auto-generated method stub
+		//post传递的参数为ajax调用进来的
+		response.setCharacterEncoding("UTF-8");
+	try {
+		request.setCharacterEncoding("UTF-8");
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	String name=request.getParameter("name");
+	int jiedian=Integer.parseInt(request.getParameter("jiedian"));
+	String result=new Gaoweidb2().getNextData(name, jiedian);
+	PrintWriter out = response.getWriter();  
+    out.write(result);  
+	
+	}
+}
+
+
