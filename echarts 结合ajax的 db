@@ -1,0 +1,50 @@
+package form;
+
+import java.util.List;
+import java.util.Map;
+
+import com.aisino.platform.core.SqlPlugin;
+import com.aisino.platform.db.DbSvr;
+import com.alibaba.fastjson.JSON;
+
+public class Gaoweidb2 extends SqlPlugin{
+	public String getNextData(String name,int jiedian){
+		//ajax调用的方法，仅传回双击节点的上下级数据
+		DbSvr svr=this.getDbService();
+		
+		String result = null;
+		
+		
+		String sql1="select XFMC name,XFMC source,GFMC target,"+(jiedian+1)+" jiedian  from dzdz_fpxx_zzsfp where GFMC = ? group by XFMC,GFMC";
+		String sql2="select GFMC name,GFMC source,XFMC target,"+(jiedian-1)+" jiedian  from dzdz_fpxx_zzsfp where XFMC = ?  group by XFMC,GFMC";
+		if(jiedian>0){//判断节点是向上级查询还是向下级查询
+			List<Map> listfather=svr.getListResult(sql1, name);
+			result=JSON.toJSONString(listfather);
+			}else if(jiedian <0){
+			List<Map> listchild=svr.getListResult(sql2, name);
+			result=JSON.toJSONString(listchild);
+		}else{//如果传过来的参数是本节点的则将上级查询和下级查询都返回回去
+			List<Map> listfather=svr.getListResult(sql1, name);
+			List<Map> listchild=svr.getListResult(sql2, name);
+			result=JSON.toJSONString(listfather)+"%"+JSON.toJSONString(listchild);
+			System.out.println("db2");
+			System.out.println(result);
+		}
+		
+			
+		
+		
+		return result;
+	}
+
+	public Object getData(String name){
+		// TODO Auto-generated method stub
+		//查询按钮调用的方法,仅传回本级节点数据
+		String sql1="select GFMC name,0 jiedian from dzdz_fpxx_zzsfp where GFMC like ? group by GFMC";
+		DbSvr svr=this.getDbService();
+		name="%"+name+"%";
+		List<Map> executeQuery = svr.getListResult(sql1,name);
+		Object result=JSON.toJSON(executeQuery);
+		return result;
+	}
+}
