@@ -1,0 +1,203 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script src="pt/component/jQuery/jquery-1.11.3.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="echarts/echarts/dist/echarts3.0.js"></script>
+<script type="text/javascript">
+window.onload=function(){
+	
+	
+var mycharts=echarts.init(document.getElementById("jieguo"));//获取需要进行应用echarts的对象
+var Infodata=${Infodata};//获取初始查询出的数据
+
+
+option = {//关系图的配置
+title: {//标题组件，包含主标题和副标题
+text: '高危企业关系图'
+},
+tooltip: {//提示框组件
+
+},
+animationDurationUpdate: 3,//动画时常
+animationEasingUpdate: 'quinticInOut',//数据更新动画的缓动效果
+series : [
+{
+type: 'graph',//系列类型：关系图
+layout:'force',//采用力引导布局
+roam: true,//开启鼠标缩放和平移
+focusNodeAdjacency:true,//在鼠标移动到节点上时显示邻接节点和连线
+force:{
+initLayout:'circular',//初始化布局
+repulsion:8000,//节点之间的斥力
+edgeLength:[100,300],//边两边的节点的距离
+gravity:0.1//引力因子
+},
+edgeSymbol: ['none', 'arrow'],//连线的类型
+symbolSize:100,//节点大小
+itemStyle:{//图形样式
+normal:{
+	color:'#CD0000'
+	
+}
+},
+lineStyle: {//连线样式
+normal: {
+	color:'#32CD32',
+    opacity: 0.9,//图形透明度
+    width: 1,//线宽
+    curveness: 0.233,//线的曲度
+    type:'dotted'//虚线
+      }
+},
+label: {
+normal: {//文本标签
+    show: true,
+    textStyle: {
+        fontSize: 8,//字号
+        color:'#2E2E2E'
+    }
+}
+
+},
+categories:[{
+name:'0',
+symbol:'pin',
+itemStyle:{
+	normal:{
+		color:'#EE1289'
+	}
+	}
+},{
+name:'1',
+symbol:'pin',
+itemStyle:{
+	normal:{
+		color:'#DC143C'
+		}
+}
+}],
+data:Infodata,//节点数据
+
+
+
+
+links:[],//连线数据
+symbol:'pin',//节点样式
+symbolSize:100//节点大小
+}
+]
+};
+
+
+mycharts.setOption(option);//创建关系图
+
+
+mycharts.on("dblclick",function choose(param){
+	var options=mycharts.getOption();
+	var selected =param.data;//获取被双击节点数据
+	var index=0;//节点索引
+	var first=options.series[0].data;//获取当前节点数据
+	var link=options.series[0].links;//获取当前节点之间连线
+	if(selected.jiedian>2|selected.jiedian<-2){//判断当触发时间的节点超过三级时提示并不做任何操作
+		alert("超过三级查询");
+		return;
+	}
+	
+	
+       for(i=0;i<first.length;i++){
+       if(first[i].id==selected.id){
+       	
+       index=i; //找出当前点击的节点的索引
+       }
+       }
+	
+	
+	$.ajax({
+type:"post",
+url:"getNextData",
+data:{"name":param.name,"jiedian":selected.jiedian},
+dataType:"text",
+async:true,
+success:function(result){
+	var jddata=result.split("%");//获取的结果
+	var linkdata=[];//节点连线数据
+	var newjddata=first;//新的节点数据
+	
+	
+	first[index].flag=false;
+	
+	for(var num=0;num<jddata.length;num++){ 
+		var evaldata=eval(jddata[num]);//将结果字符串转换位json
+		
+		if(evaldata==null) break;//如果结果字符串位null则跳过
+		linkdata=linkdata.concat(evaldata);//将结果集与原连线数据合并
+	for(var i=0;i<(evaldata).length;i++){//对节点数据进行去重
+		var j;
+		for(j=0;j<newjddata.length;j++){
+			if(evaldata[i].name==newjddata[j].name){
+				break;
+				
+			}
+			 
+		}
+		if(j==first.length){
+			newjddata.push({"name":evaldata[i].name,"symbolSize":(20-evaldata[i]*2)^2*25,"jiedian":evaldata[i].jiedian});
+		}
+		
+		
+		
+	}
+	}
+	
+	
+	
+	
+	mycharts.setOption(
+		{series:[{
+			data:newjddata,
+			links:link.concat(linkdata)
+		}]
+		}
+		
+		
+		
+	);
+	
+	
+}
+});
+
+
+
+
+
+
+
+}
+);
+
+
+
+
+
+
+
+}
+</script>
+</head>
+<body>
+	<div>
+			<form action="getNextData" method="get">
+			
+			<input type="text" id="chaxuntext" name="chaxuntext"/>
+			<input type="submit" id="search" value="查询"/>
+			</form>
+		</div>
+		<div id="jieguo" style="width:1000px;height:800px;">
+		</div>
+</body>
+</html>
