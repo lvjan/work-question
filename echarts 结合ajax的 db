@@ -16,7 +16,7 @@ public class Gaoweidb2 extends SqlPlugin{
 		
 		
 		String sql1="select XFMC name,XFMC source,GFMC target,"+(jiedian+1)+" jiedian  from dzdz_fpxx_zzsfp where GFMC = ? group by XFMC,GFMC";
-		String sql2="select GFMC name,GFMC source,XFMC target,"+(jiedian-1)+" jiedian  from dzdz_fpxx_zzsfp where XFMC = ?  group by XFMC,GFMC";
+		String sql2="select GFMC name,GFMC target,XFMC source,"+(jiedian-1)+" jiedian  from dzdz_fpxx_zzsfp where XFMC = ?  group by XFMC,GFMC";
 		if(jiedian>0){//判断节点是向上级查询还是向下级查询
 			List<Map> listfather=svr.getListResult(sql1, name);
 			result=JSON.toJSONString(listfather);
