@@ -24,6 +24,7 @@ tooltip: {//提示框组件
 },
 animationDurationUpdate: 3,//动画时常
 animationEasingUpdate: 'quinticInOut',//数据更新动画的缓动效果
+backgroundColor:'rgb(0,0,0)',
 series : [
 {
 type: 'graph',//系列类型：关系图
@@ -58,7 +59,6 @@ normal: {//文本标签
     show: true,
     textStyle: {
         fontSize: 8,//字号
-        color:'#2E2E2E'
     }
 }
 
@@ -76,10 +76,36 @@ name:'1',
 symbol:'pin',
 itemStyle:{
 	normal:{
-		color:'#DC143C'
+		color:'#13143C'
 		}
 }
-}],
+},{
+	name:'2',
+	symbol:'pin',
+	itemStyle:{
+		normal:{
+			color:'#DC14DC'
+			}
+	}
+	}
+	,{
+		name:'3',
+		symbol:'pin',
+		itemStyle:{
+			normal:{
+				color:'#AC133C'
+				}
+		}
+		},
+		{
+			name:'4',
+			symbol:'pin',
+			itemStyle:{
+				normal:{
+					color:'#DC143C'
+					}
+			}
+			}],
 data:Infodata,//节点数据
 
 
@@ -145,7 +171,7 @@ success:function(result){
 			 
 		}
 		if(j==first.length){
-			newjddata.push({"name":evaldata[i].name,"symbolSize":(20-evaldata[i]*2)^2*25,"jiedian":evaldata[i].jiedian});
+			newjddata.push({"name":evaldata[i].name,"symbolSize":(10-Math.pow(evaldata[i].jiedian,2))*10,"jiedian":evaldata[i].jiedian,"category":evaldata[i].jiedian+2});
 		}
 		
 		
@@ -190,14 +216,14 @@ success:function(result){
 </script>
 </head>
 <body>
-	<div>
-			<form action="getNextData" method="get">
+<div>
+		<form action="getNextData" method="get">
 			
-			<input type="text" id="chaxuntext" name="chaxuntext"/>
-			<input type="submit" id="search" value="查询"/>
-			</form>
-		</div>
-		<div id="jieguo" style="width:1000px;height:800px;">
-		</div>
+		<input type="text" id="chaxuntext" name="chaxuntext"/>
+		<input type="submit" id="search" value="查询"/>
+		</form>
+</div>
+<div id="jieguo" style="width:100%;height:600px;">
+</div>
 </body>
 </html>
