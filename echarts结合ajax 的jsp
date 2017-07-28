@@ -73,7 +73,7 @@ itemStyle:{
 	}
 },{
 name:'1',
-symbol:'pin',
+symbol:'pin', 
 itemStyle:{
 	normal:{
 		color:'#13143C'
